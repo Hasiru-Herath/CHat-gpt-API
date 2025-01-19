@@ -1,107 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat Me</title>
-    <link rel="stylesheet" href="index.css" />
-  </head>
-  <body>
+
+</head>
+<body>
     <h1>Chat Me</h1>
     <div id="chat-container"></div>
     <div id="input-container">
-      <input
-        type="text"
-        id="message-input"
-        placeholder="Type your message here..."
-      />
-      <button id="send-button">Send</button>
+        <input
+            type="text"
+            id="message-input"
+            placeholder="Type your message here..."
+        />
+        <button id="send-button">Send</button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-      const chatContainer = document.getElementById("chat-container");
-      const messageInput = document.getElementById("message-input");
-      const sendButton = document.getElementById("send-button");
+        const chatContainer = document.getElementById("chat-container");
+        const messageInput = document.getElementById("message-input");
+        const sendButton = document.getElementById("send-button");
 
-      const apiOptions = {
-        method: "POST",
-        url: "https://open-ai21.p.rapidapi.com/conversationllama",
-        headers: {
-          "x-rapidapi-key":
-            "38ec220955mshbd577f77fd28d80p1a08e8jsn29e489bb50c4",
-          "x-rapidapi-host": "open-ai21.p.rapidapi.com",
-          "Content-Type": "application/json",
-        },
-      };
+        const apiOptions = {
+            method: "POST",
+            url: "https://open-ai21.p.rapidapi.com/conversationllama",
+            headers: {
+                "x-rapidapi-key": "38ec220955mshbd577f77fd28d80p1a08e8jsn29e489bb50c4",
+                "x-rapidapi-host": "open-ai21.p.rapidapi.com",
+                "Content-Type": "application/json",
+            },
+        };
 
-      function createTypingIndicator() {
-        const indicator = document.createElement("div");
-        indicator.className = "typing-indicator bot";
-        indicator.innerHTML = `
+        // Adjust chat container height on mobile devices when keyboard appears
+        if ('virtualKeyboard' in navigator) {
+            navigator.virtualKeyboard.overlaysContent = true;
+        }
+
+        // Handle mobile viewport height issues
+        function adjustHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        window.addEventListener('resize', adjustHeight);
+        window.addEventListener('orientationchange', adjustHeight);
+        adjustHeight();
+
+        function createTypingIndicator() {
+            const indicator = document.createElement("div");
+            indicator.className = "typing-indicator bot";
+            indicator.innerHTML = `
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
                 <div class="typing-dot"></div>
             `;
-        return indicator;
-      }
-
-      function appendMessage(content, type) {
-        const messageDiv = document.createElement("div");
-        messageDiv.className = `message ${type}`;
-        messageDiv.textContent = content;
-        chatContainer.appendChild(messageDiv);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
-
-      async function handleSendMessage() {
-        const userMessage = messageInput.value.trim();
-        if (!userMessage) return;
-
-        appendMessage(userMessage, "user");
-        messageInput.value = "";
-
-        const typingIndicator = createTypingIndicator();
-        chatContainer.appendChild(typingIndicator);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-
-        try {
-          const response = await axios.request({
-            ...apiOptions,
-            data: {
-              messages: [{ role: "user", content: userMessage }],
-              web_access: false,
-            },
-          });
-
-          typingIndicator.remove();
-
-          const botReply = response.data.result;
-          appendMessage(botReply, "bot");
-        } catch (error) {
-          typingIndicator.remove();
-          if (error.status === 429) {
-            appendMessage(
-              "Error: Rate limit exceeded. Please try again later.",
-              "bot"
-            );
-            console.error(error);
-
-            return;
-          }
-          appendMessage(
-            "Error: Unable to fetch response. Please try again.",
-            "bot"
-          );
-          console.error(error);
+            return indicator;
         }
-      }
 
-      sendButton.addEventListener("click", handleSendMessage);
+        function appendMessage(content, type) {
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = content;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-      messageInput.addEventListener("keypress", (event) => {
-        if (event.key === "Enter") handleSendMessage();
-      });
+        async function handleSendMessage() {
+            const userMessage = messageInput.value.trim();
+            if (!userMessage) return;
+
+            appendMessage(userMessage, "user");
+            messageInput.value = "";
+            
+            const typingIndicator = createTypingIndicator();
+            chatContainer.appendChild(typingIndicator);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                const response = await axios.request({
+                    ...apiOptions,
+                    data: {
+                        messages: [{ role: "user", content: userMessage }],
+                        web_access: false,
+                    },
+                });
+
+                typingIndicator.remove();
+                
+                const botReply = response.data.result;
+                appendMessage(botReply, "bot");
+            } catch (error) {
+                typingIndicator.remove();
+                appendMessage("Error: Unable to fetch response. Please try again.", "bot");
+                console.error(error);
+            }
+        }
+
+        sendButton.addEventListener("click", handleSendMessage);
+        messageInput.addEventListener("keypress", (event) => {
+            if (event.key === "Enter") handleSendMessage();
+        });
+
+        // Prevent zoom on double tap (iOS)
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
-  </body>
+</body>
 </html>
