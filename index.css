@@ -10,51 +10,52 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: clamp(10px, 3vw, 20px);
 }
 
 h1 {
     text-align: center;
     color: #ffffff;
-    margin: 20px 0;
-    font-size: 2.5rem;
+    margin: clamp(10px, 3vw, 20px) 0;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 #chat-container {
     flex: 1;
     background: rgba(18, 18, 18, 0.95);
-    border-radius: 20px;
-    padding: 20px;
-    margin: 20px auto;
+    border-radius: clamp(10px, 3vw, 20px);
+    padding: clamp(10px, 3vw, 20px);
+    margin: clamp(10px, 3vw, 20px) auto;
     width: 100%;
-    max-width: 800px;
+    max-width: min(800px, 95vw);
     overflow-y: auto;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    height: 60vh;
+    height: clamp(400px, 60vh, 70vh);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #input-container {
     display: flex;
-    gap: 10px;
-    margin: 20px auto;
+    gap: clamp(5px, 2vw, 10px);
+    margin: clamp(10px, 3vw, 20px) auto;
     width: 100%;
-    max-width: 800px;
-    padding: 0 10px;
+    max-width: min(800px, 95vw);
+    padding: 0 clamp(5px, 2vw, 10px);
 }
 
 #message-input {
     flex: 1;
-    padding: 15px;
+    padding: clamp(10px, 3vw, 15px);
     border: none;
     border-radius: 25px;
-    font-size: 16px;
+    font-size: clamp(14px, 2vw, 16px);
     background: #1a1a1a;
     color: #ffffff;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 0; /* Prevents flex item from overflowing */
 }
 
 #message-input::placeholder {
@@ -69,16 +70,17 @@ h1 {
 }
 
 #send-button {
-    padding: 15px 30px;
+    padding: clamp(10px, 2vw, 15px) clamp(15px, 4vw, 30px);
     border: none;
     border-radius: 25px;
     background: #2c2c2c;
     color: white;
-    font-size: 16px;
+    font-size: clamp(14px, 2vw, 16px);
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap; /* Prevents button text from wrapping */
 }
 
 #send-button:hover {
@@ -88,12 +90,13 @@ h1 {
 }
 
 .message {
-    margin: 10px 0;
-    padding: 15px;
+    margin: clamp(5px, 2vw, 10px) 0;
+    padding: clamp(10px, 3vw, 15px);
     border-radius: 15px;
-    max-width: 80%;
+    max-width: min(80%, 500px);
     animation: fadeIn 0.5s ease;
     word-wrap: break-word;
+    font-size: clamp(14px, 2vw, 16px);
 }
 
 @keyframes fadeIn {
@@ -123,35 +126,37 @@ h1 {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Custom scrollbar */
-#chat-container::-webkit-scrollbar {
-    width: 8px;
-}
+/* Custom scrollbar - shown only on desktop */
+@media (min-width: 768px) {
+    #chat-container::-webkit-scrollbar {
+        width: 8px;
+    }
 
-#chat-container::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-}
+    #chat-container::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+    }
 
-#chat-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-}
+    #chat-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+    }
 
-#chat-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    #chat-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
 }
 
 /* Loading animation */
 .typing-indicator {
     display: flex;
-    gap: 5px;
-    padding: 10px;
+    gap: clamp(3px, 1vw, 5px);
+    padding: clamp(5px, 2vw, 10px);
 }
 
 .typing-dot {
-    width: 8px;
-    height: 8px;
+    width: clamp(6px, 1.5vw, 8px);
+    height: clamp(6px, 1.5vw, 8px);
     background: #ffffff;
     border-radius: 50%;
     animation: typingBounce 1s infinite;
@@ -164,4 +169,65 @@ h1 {
 @keyframes typingBounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    #chat-container {
+        height: calc(100vh - 160px); /* Adjust for header and input container */
+        margin: 10px auto;
+    }
+
+    .message {
+        max-width: 85%;
+    }
+
+    #send-button {
+        padding: 10px 20px;
+    }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 481px) and (max-width: 768px) {
+    #chat-container {
+        height: calc(100vh - 180px);
+    }
+}
+
+/* Ensure the interface works in landscape mode on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    body {
+        padding: 5px;
+    }
+
+    h1 {
+        margin: 5px 0;
+        font-size: 1.5rem;
+    }
+
+    #chat-container {
+        height: calc(100vh - 120px);
+        margin: 5px auto;
+    }
+
+    #input-container {
+        margin: 5px auto;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    /* Already dark themed, but could add specific dark mode adjustments here */
+}
+
+/* Prevent text scaling in landscape mode on iOS */
+@supports (-webkit-touch-callout: none) {
+    body {
+        text-size-adjust: none;
+        -webkit-text-size-adjust: none;
+    }
 }
